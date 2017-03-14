@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
     public static class ChessPGN
     {        
@@ -268,7 +268,7 @@ namespace TestAsync.Chess
                     destinationRow = byte.Parse(new string(row, 1));
                     destinationCol = col;
                 }
-                string algebraicCoordinates = string.Format("{0}{ 1}", col, row);
+                string algebraicCoordinates = string.Format("{0}{1}", col, row);
                 toCell = board[algebraicCoordinates];
                 PGNMove = PGNMove.Substring(0, PGNMove.Length - 2);
             }

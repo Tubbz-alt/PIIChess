@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
     public class ChessPiece: IEqualityComparer<ChessPiece>
     {        
@@ -90,20 +90,7 @@ namespace TestAsync.Chess
         }
         private void CalcularMovimientosComoPeon()
         {
-            ChessCellOffset[] whiteMovements = new ChessCellOffset[] {
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_Forward),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_Forward, 2),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_DiagonalForwardLeft),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_DiagonalForwardRight),
-            };
-            ChessCellOffset[] blackMovements = new ChessCellOffset[] {
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_Back),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_Back, 2),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_DiagonalBackwardRight),
-                                                new ChessCellOffset(CellOffsetDirectionEnum.CellOffsetDirectionEnum_DiagonalBackwardLeft),
-            };
-
-            ChessCellOffset[] moves = Color == ChessColor.ChessColor_White ? whiteMovements : blackMovements;
+            ChessCellOffset[] moves = ChessCellOffset.GetPawnMoveSet(Color);
 
             for (int i = 0; i < moves.Count(); i++)
             {

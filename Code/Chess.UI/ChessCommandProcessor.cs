@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Chess.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TestAsync.Chess.UI;
 
-namespace TestAsync.Chess
+namespace Chess.UI
 {
     public class ChessCommandProcessor
     {

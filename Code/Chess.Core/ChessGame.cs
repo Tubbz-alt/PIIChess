@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess   
+namespace Chess.Core
 {    
     /// <summary>
     /// This class manages the game, it ensures that the chess rules will be observed.
@@ -12,7 +12,7 @@ namespace TestAsync.Chess
     public class ChessGame
     {
         public event EventHandler OnGameStart;
-        public event EventHandler<ChessPlayer> OnTurnStart;
+        public event EventHandler<OnTurnStartEventArgs> OnTurnStart;
 
         public ChessPlayer PlayerWhite { get; private set; }
         public ChessPlayer PlayerBlack { get; private set; }
@@ -99,12 +99,9 @@ namespace TestAsync.Chess
         private void StartTurnForPlayer(ChessPlayer player)
         {
             NextTurnPlayer = player;
-            OnTurnStart?.Invoke(this, NextTurnPlayer);
+            OnTurnStart?.Invoke(this, new OnTurnStartEventArgs(NextTurnPlayer));
         }
-        public void OnTurnStartEventRaiser()
-        {
-            OnTurnStart?.Invoke(this, NextTurnPlayer);
-        }
+
 
         private void InitializeBoard()
         {
@@ -216,15 +213,16 @@ namespace TestAsync.Chess
 
         #region CLOCKS EVENTS
         //The game never stop the clock itself, but it starts the clocks automatically.
-        private void PlayerClock_OnTimeFinish(object sender, ChessPlayer e)
+        private void PlayerClock_OnTimeFinish(object sender, ChessClockEventArgs e)
         {
             GameStatus = ChessGameStatus.ChessGameStatus_Finihed;
         }
 
-        private void PlayerClock_OnClockStop(object sender, ChessPlayer e)
+        private void PlayerClock_OnClockStop(object sender, ChessClockEventArgs e)
         {
-            //The player has stoped his clock. 
-            if (e.Equals(PlayerBlack))
+            //The player has stoped his clock.
+            ChessPlayer p = e.Player; 
+            if (p.Equals(PlayerBlack))
             {
                 StartTurnForPlayer(PlayerWhite);
             }
@@ -236,51 +234,52 @@ namespace TestAsync.Chess
         #endregion
 
         #region PLAYER EVENTS
-        private void Player_OnMoveRequested(object sender, ChessMove e)
+        private void Player_OnMoveRequested(object sender, OnMoveRequestedEventArgs e)
         {
+            ChessMove move = e.Move;
             try
-            {
+            {               
                 //CHECK IF THE MOVEMENT IS VALID FOR THIS PIECE
                 //CHECK IF THE MOVEMENT DOES NOT PUT THE OWN KING IN RISK
                 //
-                if (e.Destiny.PieceInCell != null)
+                if (e.Move.Destiny.PieceInCell != null)
                 {
                     //Atttempt to move to an occupied cell.
-                    if (! e.PieceToMove.Player.Equals(e.Destiny.PieceInCell.Player))
+                    if (!move.PieceToMove.Player.Equals(move.Destiny.PieceInCell.Player))
                     {
                         //isCapture                    
 
-                        Board.MovePiece(e.PieceToMove, e.Destiny.RowIndex, e.Destiny.ColumnIndex);
-                        e.MoveAccepted = true;
+                        Board.MovePiece(move.PieceToMove, move.Destiny.RowIndex, move.Destiny.ColumnIndex);
+                        move.MoveAccepted = true;
                     }
                     else
                     {
                         //Invalid Movement.
-                        e.MoveAccepted = false;
+                        move.MoveAccepted = false;
                     }
                 }
                 else
                 {
                     //Move to an empty cell
-                    Board.MovePiece(e.PieceToMove, e.Destiny.RowIndex, e.Destiny.ColumnIndex);
-                    e.MoveAccepted = true;
+                    Board.MovePiece(move.PieceToMove, move.Destiny.RowIndex, move.Destiny.ColumnIndex);
+                    move.MoveAccepted = true;
                 }
             }
             catch (ChessExceptionInvalidPGNNotation)
             {
-                e.MoveAccepted = false;
+                move.MoveAccepted = false;
             }
             catch (ChessExceptionInvalidGameAction)
             {
-                e.MoveAccepted = false;
+                move.MoveAccepted = false;
             }
             catch (ChessException)
             {
-                e.MoveAccepted = false;
+                move.MoveAccepted = false;
             }
             catch (Exception)
             {
-                e.MoveAccepted = false;
+                move.MoveAccepted = false;
             }
             
 
@@ -289,5 +288,13 @@ namespace TestAsync.Chess
         #endregion
     }
 
+    public class OnTurnStartEventArgs : EventArgs
+    {
+        public ChessPlayer Player { get; set; }
+        public OnTurnStartEventArgs(ChessPlayer player)
+        {
+            Player = player;
+        }
+    }
 
 }

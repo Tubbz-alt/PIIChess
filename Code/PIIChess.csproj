@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,6 +56,7 @@
     <Compile Include="Chess.Core\ChessMove.cs" />
     <Compile Include="Chess.Core\ChessPGN.cs" />
     <Compile Include="Chess.Core\ChessPiece.cs" />
+    <Compile Include="Chess.Core\ChessPieceMoveRules.cs" />
     <Compile Include="Chess.Core\ChessPlayer.cs" />
     <Compile Include="Chess.Core\Enums.cs" />
     <Compile Include="Chess.UI\ChessCommandProcessor.cs" />
@@ -63,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

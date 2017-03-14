@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
     public class ChessBoardCell
     {

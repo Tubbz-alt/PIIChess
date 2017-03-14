@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Chess.Core;
+using System;
 
-namespace TestAsync.Chess.UI
+namespace Chess.UI
 {
     public interface IChessRenderEngine
     {

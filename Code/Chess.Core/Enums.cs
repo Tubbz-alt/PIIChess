@@ -50,6 +50,7 @@ public enum ExceptionCode
     InvalidInitialPiecePosition,
     InvalidCellIndexes,
     InvalidAttemptToCapturePiece,
+    InvalidColorPiece
 }
 
 public enum CommandCode

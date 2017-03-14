@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
-    public class ChessBoardClock
+    public class ChessBoardClock:IDisposable
     {
-        public event EventHandler<ChessPlayer> OnClockStart;
-        public event EventHandler<ChessPlayer> OnClockStop;
-        public event EventHandler<ChessPlayer> OnTimeFinish;
+        public event EventHandler<ChessClockEventArgs> OnClockStart;
+        public event EventHandler<ChessClockEventArgs> OnClockStop;
+        public event EventHandler<ChessClockEventArgs> OnTimeFinish;
 
         #region FIELDS
+        bool disposed = false;
         private TimeSpan _spentTime;
         private TimeSpan _leftTime;
         #endregion
@@ -118,7 +119,7 @@ namespace TestAsync.Chess
             {
                 LastTurnStartAt = DateTime.UtcNow;
                 myClock = new System.Threading.Timer(ClockTick, null, 0, 1000);
-                OnClockStart?.Invoke(this, Player);
+                OnClockStart?.Invoke(this, new ChessClockEventArgs(Player));
             }
         }
 
@@ -129,7 +130,7 @@ namespace TestAsync.Chess
                 myClock.Dispose();
                 myClock = null;
                 LastTurnStartAt = null;
-                OnClockStop?.Invoke(this, Player);
+                OnClockStop?.Invoke(this, new ChessClockEventArgs(Player));
             }
         }
 
@@ -145,13 +146,50 @@ namespace TestAsync.Chess
                     {
                         Stop();
                         this.State = ClockState.Finished;
-                        OnTimeFinish?.Invoke(this, Player); //WARNING: Event Raised in a background thread.
+                        OnTimeFinish?.Invoke(this, new ChessClockEventArgs(Player)); //WARNING: Event Raised in a background thread.
                     }
                 }                
             }
         }
 
+        // Public implementation of Dispose pattern callable by consumers.
+        // https://msdn.microsoft.com/en-us/library/system.idisposable(v=vs.110).aspx
+        //
+        // A base class with subclasses that should be disposable must implement 
+        // IDisposable as follows. You should use this pattern whenever you implement
+        // IDisposable on any type that isn't sealed 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                this.myClock.Dispose();
+                // Free any other managed objects here.
+                //
+            }
+            this.myClock = null;
+            // Free any unmanaged objects here.
+            //
+            disposed = true;
+        }
+    }
+
+    public class ChessClockEventArgs : EventArgs
+    {
+        public ChessPlayer Player { get; set; }
+        public ChessClockEventArgs(ChessPlayer player)
+        {
+            Player = player;
+        }
     }
 
 }

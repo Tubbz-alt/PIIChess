@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
-    public class ChessPlayer:IEqualityComparer<ChessPlayer>
+    public class ChessPlayer : IEqualityComparer<ChessPlayer>
     {
 
         public string NickName { get; set; }
@@ -16,8 +16,8 @@ namespace TestAsync.Chess
         public ChessGame Game { get; private set; }
         public ChessBoardClock Clock { get; set; }
         public Guid Id { get; private set; }
-        public event EventHandler<ChessMove> OnMoveRequested;
-        public event EventHandler<ChessPiece> OnResignGame;
+        public event EventHandler<OnMoveRequestedEventArgs> OnMoveRequested;
+       // public event EventHandler<OnResignGameEventArgs> OnResignGame;
 
         public ChessPlayer(string nickName, ChessColor color, ChessGame game, ChessBoardClock clock)
         {
@@ -58,7 +58,7 @@ namespace TestAsync.Chess
                 }
                 else {
                     Console.Write("AAAAA");
-                }               
+                }
             }
         }
 
@@ -71,9 +71,9 @@ namespace TestAsync.Chess
                 return Clock.LastTurnStartAt.HasValue;
             }
         }
-        private void Game_OnTurnStart(object sender, ChessPlayer e)
+        private void Game_OnTurnStart(object sender, OnTurnStartEventArgs e)
         {
-            if (this.Equals(e))
+            if (this.Equals(e.Player))
             {
                 Clock.Start();
             }
@@ -91,7 +91,7 @@ namespace TestAsync.Chess
 
         public void MovePiece(string pgnMove)
         {
-            ChessMove move = ChessPGN.GetMoveFromPGN(pgnMove,this, Game.Board);
+            ChessMove move = ChessPGN.GetMoveFromPGN(pgnMove, this, Game.Board);
             RequestMovement(move);
         }
 
@@ -112,21 +112,21 @@ namespace TestAsync.Chess
                     ChessMove move = ChessMove.CreateStandardChessMove(fromCell, toCell);
                     RequestMovement(move);
                 } else {
-                    throw new ChessExceptionInvalidGameAction(ExceptionCode.AttemptToMoveOtherPlayerPiece, "Piece does not belong to this player: " + 
-                        fromCell.PieceInCell.ToString() + 
-                        fromCell.ToString() + 
-                        "[" 
-                        + 
-                            (fromCell.PieceInCell.Color == ChessColor.ChessColor_Black?"B":"W") 
-                        + 
+                    throw new ChessExceptionInvalidGameAction(ExceptionCode.AttemptToMoveOtherPlayerPiece, "Piece does not belong to this player: " +
+                        fromCell.PieceInCell.ToString() +
+                        fromCell.ToString() +
+                        "["
+                        +
+                            (fromCell.PieceInCell.Color == ChessColor.ChessColor_Black ? "B" : "W")
+                        +
                         "]");
                 }
-                
+
             }
             else {
                 throw new ChessExceptionInvalidGameAction(ExceptionCode.InvalidMovement, "Cell is empty: " + from);
             }
-            
+
         }
 
         private void RequestMovement(ChessMove move)
@@ -135,8 +135,8 @@ namespace TestAsync.Chess
 
             if (this.Equals(piece.Player))
             {
-                
-                OnMoveRequested?.Invoke(this, move);
+
+                OnMoveRequested?.Invoke(this, new OnMoveRequestedEventArgs(move));
 
                 if (move.MoveAccepted)
                 {
@@ -149,7 +149,7 @@ namespace TestAsync.Chess
             }
             else
             {
-                throw new ChessExceptionInvalidGameAction(ExceptionCode.AttemptToMoveOtherPlayerPiece, "Move: " + move.ToString() );
+                throw new ChessExceptionInvalidGameAction(ExceptionCode.AttemptToMoveOtherPlayerPiece, "Move: " + move.ToString());
             }
         }
 
@@ -190,13 +190,21 @@ namespace TestAsync.Chess
 
         #endregion
 
-
-
-
-
-
-
     }
 
+    public class OnMoveRequestedEventArgs:EventArgs
+    {
+        public ChessMove Move { get; set; }
+        public OnMoveRequestedEventArgs(ChessMove move)
+        {
+            Move = move;
+        }
+    }
+
+    public class OnResignGameEventArgs : EventArgs
+    {
+        public OnResignGameEventArgs()
+        { }
+    }
 
 }

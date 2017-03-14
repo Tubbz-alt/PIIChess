@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestAsync.Chess
+namespace Chess.Core
 {
     
     public class ChessBoard
@@ -212,8 +212,8 @@ namespace TestAsync.Chess
             this.PieceInserted = piece;
             this.DestinationCell = destinationCell;
         }
-        public ChessPiece PieceInserted;
-        public ChessBoardCell DestinationCell;
+        public ChessPiece PieceInserted { get; set; }
+        public ChessBoardCell DestinationCell { get; set; }
     }
 
     public class PieceCapturedEventArgs : EventArgs
@@ -222,7 +222,7 @@ namespace TestAsync.Chess
         {
             this.PieceCaptured = piece;
         }
-        public ChessPiece PieceCaptured;
+        public ChessPiece PieceCaptured { get; set; }
     }
 
 }
